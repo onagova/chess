@@ -68,6 +68,7 @@ class Piece
         moves << MoveRecord.new(self, current_dest)
       elsif piece.owner.set != @owner.set
         moves << CaptureRecord.new(self, current_dest, piece)
+        break
       else
         break
       end
