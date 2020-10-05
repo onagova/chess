@@ -19,7 +19,9 @@ class Board
   end
 
   def pieces_by_set(set)
-    @pieces.select { |piece| piece.owner.set == set }
+    @pieces.select do |piece|
+      piece.enabled && piece.owner.set == set
+    end
   end
 
   def king_exposed?(set)
