@@ -4,6 +4,8 @@ require './lib/eight_way_directions'
 class Rook < Piece
   include EightWayDirections
 
+  attr_reader :has_moved
+
   def initialize(board, position, owner)
     super
     @has_moved = false
@@ -21,6 +23,11 @@ class Rook < Piece
 
   def move(dest)
     super
+    @has_moved = true
+  end
+
+  def force_move(dest)
+    @position = dest
     @has_moved = true
   end
 end

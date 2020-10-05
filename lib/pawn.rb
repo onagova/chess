@@ -35,6 +35,10 @@ class Pawn < Piece
     @has_moved = true
   end
 
+  def attack_positions
+    capture_dests.reject { |dest| @board.out_of_bounds?(dest) }
+  end
+
   private
 
   def advanceable?(dest)

@@ -1,3 +1,5 @@
+require './lib/capture_record'
+
 class Board
   attr_accessor :last_move
 
@@ -16,7 +18,15 @@ class Board
     end
   end
 
+  def pieces_by_set(set)
+    @pieces.select { |piece| piece.owner.set == set }
+  end
+
   def king_exposed?(set)
     nil
+  end
+
+  def attack_positions(set)
+    pieces_by_set(set).reduce([]) { |a, v| a.concat(v.attack_positions) }
   end
 end

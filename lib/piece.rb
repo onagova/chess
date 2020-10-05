@@ -42,15 +42,16 @@ class Piece
   end
 
   def move(dest)
-    move = legal_moves.find { |v| v.dest == dest }
-
-    msg = "illegal move #{@position.to_file_rank} -> #{dest.to_file_rank}"
-    raise CustomError, msg if move.nil?
+    move = validate_destination(dest)
 
     @position = move.dest
     move.captured.enabled = false if move.is_a?(CaptureRecord)
 
     @board.last_move = move
+  end
+
+  def attack_positions
+    reachables.map(&:dest)
   end
 
   private
@@ -77,5 +78,14 @@ class Piece
     end
 
     moves
+  end
+
+  def validate_destination(dest)
+    move = legal_moves.find { |v| v.dest == dest }
+
+    msg = "illegal move #{@position.to_file_rank} -> #{dest.to_file_rank}"
+    raise CustomError, msg if move.nil?
+
+    move
   end
 end
