@@ -42,14 +42,14 @@ class King < Piece
         rook_src = move.rook.position
         move.rook.force_move(move.rook_dest)
 
-        safe = !@board.king_exposed?(@set)
+        safe = !@board.king_exposed?(@owner.set)
 
         move.rook.force_move(rook_src)
       else
         captured = move.is_a?(CaptureRecord) ? move.captured : nil
         captured&.enabled = false
 
-        safe = !@board.king_exposed?(@set)
+        safe = !@board.king_exposed?(@owner.set)
 
         captured&.enabled = true
       end

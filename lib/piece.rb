@@ -32,7 +32,7 @@ class Piece
       @position = move.dest
       captured&.enabled = false
 
-      safe = !@board.king_exposed?(@set)
+      safe = !@board.king_exposed?(@owner.set)
 
       @position = temp
       captured&.enabled = true
