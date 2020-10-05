@@ -1,7 +1,7 @@
 require './lib/move_record'
 require './lib/vector_2_int'
 
-class DoubleAdvanceRecord < MoveRecord
+class EnPassantTriggerRecord < MoveRecord
   attr_reader :en_passant_pos
 
   def initialize(pawn, dest)

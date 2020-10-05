@@ -12,7 +12,7 @@ describe Pawn do
       en_passant_dest = Vector2Int.new(3, 2)
       en_passant_piece = Pawn.new(board, en_passant_dest, black_player)
 
-      board.last_move = DoubleAdvanceRecord.new(en_passant_piece, en_passant_dest)
+      board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
       board.pieces = [
         pawn,
         en_passant_piece,
@@ -109,7 +109,7 @@ describe Pawn do
         en_passant_dest = Vector2Int.new(3, 4)
         en_passant_piece = Pawn.new(board, en_passant_dest, white_player)
 
-        board.last_move = DoubleAdvanceRecord.new(en_passant_piece, en_passant_dest)
+        board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
         board.pieces = [
           pawn,
           en_passant_piece
@@ -123,7 +123,7 @@ describe Pawn do
         en_passant_dest = Vector2Int.new(3, 2)
         en_passant_piece = Pawn.new(board, en_passant_dest, black_player)
 
-        board.last_move = DoubleAdvanceRecord.new(en_passant_piece, en_passant_dest)
+        board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
         board.pieces = [
           pawn,
           en_passant_piece,
@@ -132,6 +132,38 @@ describe Pawn do
 
         reachables = pawn.reachables.map(&:dest)
         expect(reachables).not_to include(dest)
+      end
+    end
+
+    context 'when trigger an en passant' do
+      it 'lists en passant trigger correctly when adjacent is an enemy pawn' do
+        board.pieces = [
+          pawn,
+          Pawn.new(board, Vector2Int.new(3, 4), black_player)
+        ]
+
+        reachables = pawn.reachables
+        expect(reachables.one? { |v| v.is_a?(EnPassantTriggerRecord) }).to be(true)
+      end
+
+      it 'does not list en passant trigger when adjacent is an ally pawn' do
+        board.pieces = [
+          pawn,
+          Pawn.new(board, Vector2Int.new(3, 4), white_player)
+        ]
+
+        reachables = pawn.reachables
+        expect(reachables.none? { |v| v.is_a?(EnPassantTriggerRecord) }).to be(true)
+      end
+
+      it 'does not list en passant trigger when adjacent is not a pawn' do
+        board.pieces = [
+          pawn,
+          Piece.new(board, Vector2Int.new(3, 4), black_player)
+        ]
+
+        reachables = pawn.reachables
+        expect(reachables.none? { |v| v.is_a?(EnPassantTriggerRecord) }).to be(true)
       end
     end
   end

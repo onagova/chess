@@ -1,5 +1,5 @@
 require './lib/piece'
-require './lib/double_advance_record'
+require './lib/en_passant_trigger_record'
 
 class Pawn < Piece
   attr_reader :forward
@@ -13,19 +13,16 @@ class Pawn < Piece
   def reachables
     moves = []
 
-    dest = @position + Vector2Int.new(0, @forward)
-    moves << MoveRecord.new(self, dest) if advanceable?(dest)
+    move = advanceable?
+    moves << move unless move.nil?
 
-    dest = @position + Vector2Int.new(0, @forward * 2)
-    moves << DoubleAdvanceRecord.new(self, dest) if double_advanceable?(dest)
+    move = double_advanceable?
+    moves << move unless move.nil?
 
-    dest = @position + Vector2Int.new(-1, @forward)
-    captured = capturable?(dest) || en_passant_able?(dest)
-    moves << CaptureRecord.new(self, dest, captured) unless captured.nil?
-
-    dest = @position + Vector2Int.new(1, @forward)
-    captured = capturable?(dest) || en_passant_able?(dest)
-    moves << CaptureRecord.new(self, dest, captured) unless captured.nil?
+    capture_dests.each do |dest|
+      capture = capturable?(dest) || en_passant_able?(dest)
+      moves << capture unless capture.nil?
+    end
 
     moves
   end
@@ -41,28 +38,36 @@ class Pawn < Piece
 
   private
 
-  def advanceable?(dest)
-    return false if @board.out_of_bounds?(dest)
+  def advanceable?
+    dest = position + Vector2Int.new(0, @forward)
+    return nil if @board.out_of_bounds?(dest)
+    return nil unless @board.piece_at(dest).nil?
 
-    one_step = position + Vector2Int.new(0, @forward)
-    return false unless one_step == dest
-    return false unless @board.piece_at(dest).nil?
-
-    true
+    MoveRecord.new(self, dest)
   end
 
-  def double_advanceable?(dest)
-    return false if @has_moved
-    return false if @board.out_of_bounds?(dest)
+  def double_advanceable?
+    return nil if @has_moved
 
-    two_step = position + Vector2Int.new(0, @forward * 2)
-    return false unless two_step == dest
-    return false unless @board.piece_at(dest).nil?
+    dest = position + Vector2Int.new(0, @forward * 2)
+    return nil if @board.out_of_bounds?(dest)
+    return nil unless @board.piece_at(dest).nil?
 
     inbetween = position + Vector2Int.new(0, @forward)
-    return false unless @board.piece_at(inbetween).nil?
+    return nil unless @board.piece_at(inbetween).nil?
 
-    true
+    left_piece = @board.piece_at(dest + Vector2Int.new(-1, 0))
+    right_piece = @board.piece_at(dest + Vector2Int.new(1, 0))
+
+    en_passant_trigger =
+      (left_piece.is_a?(Pawn) && left_piece.owner.set != @owner.set) ||
+      (right_piece.is_a?(Pawn) && right_piece.owner.set != @owner.set)
+
+    if en_passant_trigger
+      EnPassantTriggerRecord.new(self, dest)
+    else
+      MoveRecord.new(self, dest)
+    end
   end
 
   def capturable?(dest)
@@ -73,7 +78,7 @@ class Pawn < Piece
     return nil if enemy.nil?
     return nil if enemy.owner.set == @owner.set
 
-    enemy
+    CaptureRecord.new(self, dest, enemy)
   end
 
   def en_passant_able?(dest)
@@ -82,13 +87,13 @@ class Pawn < Piece
     return nil unless @board.piece_at(dest).nil?
 
     record = @board.last_move
-    return nil unless record.is_a?(DoubleAdvanceRecord)
+    return nil unless record.is_a?(EnPassantTriggerRecord)
     return nil unless record.en_passant_pos == dest
 
     enemy = record.piece
     return nil if enemy.owner.set == @owner.set
 
-    enemy
+    CaptureRecord.new(self, dest, enemy)
   end
 
   def capture_dests
