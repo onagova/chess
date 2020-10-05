@@ -36,6 +36,10 @@ class Pawn < Piece
     capture_dests.reject { |dest| @board.out_of_bounds?(dest) }
   end
 
+  def pretty_print
+    '♟︎'.colorize(color_code)
+  end
+
   private
 
   def advanceable?

@@ -4,6 +4,7 @@ require './lib/vector_2_int'
 require './lib/board'
 require './lib/player'
 require './lib/capture_record'
+require './lib/string'
 
 class Piece
   include Essentials
@@ -54,6 +55,10 @@ class Piece
     reachables.map(&:dest)
   end
 
+  def pretty_print
+    '♦'.colorize(color_code)
+  end
+
   private
 
   def directional_reachables(dir, limit = -1)
@@ -87,5 +92,9 @@ class Piece
     raise CustomError, msg if move.nil?
 
     move
+  end
+
+  def color_code
+    @owner.set == WHITE ? WHITE_COLOR_CODE : BLACK_COLOR_CODE
   end
 end

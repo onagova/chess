@@ -30,4 +30,8 @@ class Rook < Piece
     @position = dest
     @has_moved = true
   end
+
+  def pretty_print
+    '♜'.colorize(color_code)
+  end
 end

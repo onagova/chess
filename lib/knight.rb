@@ -16,6 +16,10 @@ class Knight < Piece
     OFFSET.map { |v| reachable?(@position + v) }.reject(&:nil?)
   end
 
+  def pretty_print
+    '♞'.colorize(color_code)
+  end
+
   private
 
   def reachable?(dest)

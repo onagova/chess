@@ -87,6 +87,10 @@ class King < Piece
     moves.map(&:dest)
   end
 
+  def pretty_print
+    '♚'.colorize(color_code)
+  end
+
   private
 
   def king_side_castling?
