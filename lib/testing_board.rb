@@ -4,6 +4,7 @@ class TestingBoard < Board
   attr_accessor :pieces
 
   def initialize(col_count, row_count)
+    super()
     @col_count = col_count
     @row_count = row_count
   end

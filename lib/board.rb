@@ -5,13 +5,18 @@ require_relative 'custom_error'
 require_relative 'king'
 
 class Board
+  include Essentials
+
   attr_accessor :last_move
+  attr_reader :locked, :winner
 
   def initialize
-    @pieces = []
-    @last_move = nil
     @col_count = 8
     @row_count = 8
+    @pieces = []
+    @last_move = nil
+    @locked = false
+    @winner = nil
   end
 
   def out_of_bounds?(pos)
@@ -32,11 +37,25 @@ class Board
   end
 
   def king_exposed?(set)
-    nil
+    other_set = set == WHITE ? BLACK : WHITE
+    reachables(other_set).find do |move|
+      move.is_a?(CaptureRecord) && move.captured.is_a?(King)
+    end
   end
 
   def attack_positions(set)
     pieces_by_set(set).reduce([]) { |a, v| a.concat(v.attack_positions) }
+  end
+
+  def move_piece(src, dest, set)
+    raise CustomError, 'board is already locked' if @locked
+
+    piece = piece_at(src)
+    raise CustomError, "#{src.to_file_rank} is empty" if piece.nil?
+    raise CustomError, "#{piece} is not a #{set} piece" unless piece.owner.set == set
+
+    piece.move(dest)
+    post_move_piece(set)
   end
 
   def pretty_print
@@ -46,6 +65,22 @@ class Board
   end
 
   private
+
+  def reachables(set)
+    pieces_by_set(set).reduce([]) { |a, v| a.concat(v.reachables) }
+  end
+
+  def legal_moves(set)
+    pieces_by_set(set).reduce([]) { |a, v| a.concat(v.legal_moves) }
+  end
+
+  def post_move_piece(set)
+    other_set = set == WHITE ? BLACK : WHITE
+    return unless legal_moves(other_set).empty?
+
+    @locked = true
+    @winner = king_exposed?(other_set) ? set : nil
+  end
 
   def pretty_print_files_header
     str = '   '
