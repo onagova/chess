@@ -3,6 +3,11 @@ require_relative 'vector_2_int'
 require_relative 'string'
 require_relative 'custom_error'
 require_relative 'king'
+require_relative 'rook'
+require_relative 'bishop'
+require_relative 'queen'
+require_relative 'knight'
+require_relative 'pawn'
 
 class Board
   include Essentials
@@ -10,13 +15,36 @@ class Board
   attr_accessor :last_move
   attr_reader :locked, :winner
 
-  def initialize
+  def initialize(white_player, black_player)
     @col_count = 8
     @row_count = 8
-    @pieces = []
     @last_move = nil
     @locked = false
     @winner = nil
+
+    @pieces = [
+      Rook.new(self, Vector2Int.new(0, 0), white_player),
+      Knight.new(self, Vector2Int.new(1, 0), white_player),
+      Bishop.new(self, Vector2Int.new(2, 0), white_player),
+      Queen.new(self, Vector2Int.new(3, 0), white_player),
+      King.new(self, Vector2Int.new(4, 0), white_player),
+      Bishop.new(self, Vector2Int.new(5, 0), white_player),
+      Knight.new(self, Vector2Int.new(6, 0), white_player),
+      Rook.new(self, Vector2Int.new(7, 0), white_player),
+
+      Rook.new(self, Vector2Int.new(0, 7), black_player),
+      Knight.new(self, Vector2Int.new(1, 7), black_player),
+      Bishop.new(self, Vector2Int.new(2, 7), black_player),
+      Queen.new(self, Vector2Int.new(3, 7), black_player),
+      King.new(self, Vector2Int.new(4, 7), black_player),
+      Bishop.new(self, Vector2Int.new(5, 7), black_player),
+      Knight.new(self, Vector2Int.new(6, 7), black_player),
+      Rook.new(self, Vector2Int.new(7, 7), black_player)
+    ]
+    0.upto(7) do |i|
+      @pieces << Pawn.new(self, Vector2Int.new(i, 1), white_player)
+      @pieces << Pawn.new(self, Vector2Int.new(i, 6), black_player)
+    end
   end
 
   def out_of_bounds?(pos)

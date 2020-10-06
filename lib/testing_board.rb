@@ -4,9 +4,13 @@ class TestingBoard < Board
   attr_accessor :pieces
 
   def initialize(col_count, row_count)
-    super()
     @col_count = col_count
     @row_count = row_count
+    @last_move = nil
+    @locked = false
+    @winner = nil
+
+    @pieces = []
   end
 
   def out_of_bounds?(pos)
