@@ -1,4 +1,4 @@
-require './lib/move_record'
+require_relative 'move_record'
 
 class CastlingRecord < MoveRecord
   attr_reader :rook, :rook_dest

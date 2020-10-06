@@ -1,5 +1,5 @@
-require './lib/piece'
-require './lib/en_passant_trigger_record'
+require_relative 'piece'
+require_relative 'en_passant_trigger_record'
 
 class Pawn < Piece
   attr_reader :forward

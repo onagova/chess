@@ -1,4 +1,4 @@
-require './lib/board'
+require_relative 'board'
 
 class TestingBoard < Board
   attr_accessor :pieces

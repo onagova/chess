@@ -1,4 +1,4 @@
-require './lib/vector_2_int.rb'
+require_relative 'vector_2_int'
 
 module EightWayDirections
   NON_DIAGONAL_DIRECTIONS = [

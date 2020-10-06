@@ -1,4 +1,4 @@
-require './lib/piece'
+require_relative 'piece'
 
 class Knight < Piece
   OFFSET = [

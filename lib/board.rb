@@ -1,4 +1,8 @@
-require './lib/piece'
+require_relative 'essentials'
+require_relative 'vector_2_int'
+require_relative 'string'
+require_relative 'custom_error'
+require_relative 'king'
 
 class Board
   attr_accessor :last_move

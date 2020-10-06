@@ -1,4 +1,4 @@
-require './lib/file_rank_converter'
+require_relative 'file_rank_converter'
 
 class Vector2Int
   include FileRankConverter

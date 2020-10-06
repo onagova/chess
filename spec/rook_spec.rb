@@ -1,5 +1,6 @@
 require './lib/rook'
 require './lib/testing_board'
+require './lib/player'
 
 describe Rook do
   let(:board) { TestingBoard.new(5, 5) }

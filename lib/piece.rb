@@ -1,10 +1,8 @@
-require './lib/essentials'
-require './lib/custom_error'
-require './lib/vector_2_int'
-require './lib/board'
-require './lib/player'
-require './lib/capture_record'
-require './lib/string'
+require_relative 'essentials'
+require_relative 'vector_2_int'
+require_relative 'capture_record'
+require_relative 'string'
+require_relative 'custom_error'
 
 class Piece
   include Essentials

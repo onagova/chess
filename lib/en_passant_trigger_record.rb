@@ -1,5 +1,5 @@
-require './lib/move_record'
-require './lib/vector_2_int'
+require_relative 'move_record'
+require_relative 'vector_2_int'
 
 class EnPassantTriggerRecord < MoveRecord
   attr_reader :en_passant_pos
