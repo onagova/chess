@@ -21,4 +21,10 @@ class Vector2Int
   def to_file_rank
     "#{('a'.ord + x).chr}#{y + 1}"
   end
+
+  def self.from_file_rank(fr)
+    x = fr[0].ord - 'a'.ord
+    y = fr[1].to_i - 1
+    Vector2Int.new(x, y)
+  end
 end
