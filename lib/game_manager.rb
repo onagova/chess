@@ -26,7 +26,8 @@ class GameManager
     current_player = @white_player
     last_command = nil
 
-    until @board.locked
+    end_report = @board.end_report
+    until end_report.locked
       system 'clear'
       puts @board.pretty_print + "\n"
       puts "[#{current_player.set.capitalize}'s turn]"
@@ -46,9 +47,10 @@ class GameManager
       end
 
       current_player = other_player(current_player)
+      end_report = @board.end_report
     end
 
-    declare_winner(last_command)
+    declare_winner(end_report, last_command)
   end
 
   private
@@ -61,16 +63,16 @@ class GameManager
     end
   end
 
-  def declare_winner(last_command)
+  def declare_winner(end_report, last_command)
     system 'clear'
     puts @board.pretty_print + "\n"
 
     if last_command.is_a?(DrawRequestCommand)
       puts 'Game Over! Draw by agreement'
-    elsif @board.winner.nil?
+    elsif end_report.winner.nil?
       puts 'Game Over! Stalemate'
     else
-      puts "CHECKMATE! #{@board.winner.capitalize} wins"
+      puts "CHECKMATE! #{end_report.winner.capitalize} wins"
     end
   end
 

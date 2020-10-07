@@ -7,8 +7,6 @@ class TestingBoard < Board
     @col_count = col_count
     @row_count = row_count
     @last_move = nil
-    @locked = false
-    @winner = nil
 
     @pieces = []
   end

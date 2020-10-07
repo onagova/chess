@@ -1,6 +1,7 @@
 require_relative 'essentials'
 require_relative 'vector_2_int'
 require_relative 'string'
+require_relative 'end_report'
 require_relative 'custom_error'
 require_relative 'king'
 require_relative 'rook'
@@ -13,14 +14,11 @@ class Board
   include Essentials
 
   attr_accessor :last_move
-  attr_reader :locked, :winner
 
   def initialize(white_player, black_player)
     @col_count = 8
     @row_count = 8
     @last_move = nil
-    @locked = false
-    @winner = nil
 
     @pieces = [
       Rook.new(self, Vector2Int.new(0, 0), white_player),
@@ -76,14 +74,22 @@ class Board
   end
 
   def move_piece(src, dest, set)
-    raise CustomError, 'board is already locked' if @locked
-
     piece = piece_at(src)
     raise CustomError, "#{src.to_file_rank} is empty" if piece.nil?
     raise CustomError, "#{piece} is not a #{set} piece" unless piece.owner.set == set
 
     piece.move(dest)
-    post_move_piece(set)
+  end
+
+  def end_report
+    [WHITE, BLACK].each do |set|
+      next unless legal_moves(set).empty?
+      return EndReport.new(true, nil) unless king_exposed?(set)
+
+      return EndReport.new(true, set == WHITE ? BLACK : WHITE)
+    end
+
+    EndReport.new(false, nil)
   end
 
   def pretty_print
@@ -100,14 +106,6 @@ class Board
 
   def legal_moves(set)
     pieces_by_set(set).reduce([]) { |a, v| a.concat(v.legal_moves) }
-  end
-
-  def post_move_piece(set)
-    other_set = set == WHITE ? BLACK : WHITE
-    return unless legal_moves(other_set).empty?
-
-    @locked = true
-    @winner = king_exposed?(other_set) ? set : nil
   end
 
   def pretty_print_files_header

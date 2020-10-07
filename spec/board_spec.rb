@@ -19,9 +19,10 @@ describe Board do
         board.pieces = pieces
 
         board.move_piece(src, dest, white_player.set)
+        report = board.end_report
 
-        expect(board.locked).to be(false)
-        expect(board.winner).to be_nil
+        expect(report.locked).to be(false)
+        expect(report.winner).to be_nil
       end
     end
 
@@ -35,9 +36,10 @@ describe Board do
         board.pieces = pieces
 
         board.move_piece(src, dest, white_player.set)
+        report = board.end_report
 
-        expect(board.locked).to be(true)
-        expect(board.winner).to be(white_player.set)
+        expect(report.locked).to be(true)
+        expect(report.winner).to be(white_player.set)
       end
     end
 
@@ -50,9 +52,10 @@ describe Board do
         board.pieces = pieces
 
         board.move_piece(src, dest, white_player.set)
+        report = board.end_report
 
-        expect(board.locked).to be(true)
-        expect(board.winner).to be_nil
+        expect(report.locked).to be(true)
+        expect(report.winner).to be_nil
       end
     end
   end
