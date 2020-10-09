@@ -27,14 +27,17 @@ class Piece
     moves.select do |move|
       temp = @position
       captured = move.is_a?(CaptureRecord) ? move.captured : nil
+      prev_move = @board.last_move
 
       @position = move.dest
       captured&.enabled = false
+      @board.last_move = move
 
       safe = !@board.king_exposed?(@owner.set)
 
       @position = temp
       captured&.enabled = true
+      @board.last_move = prev_move
 
       safe
     end
