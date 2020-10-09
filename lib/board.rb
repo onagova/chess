@@ -15,6 +15,7 @@ class Board
   include Essentials
 
   attr_accessor :last_move
+  attr_reader :pieces
 
   def initialize(white_player, black_player)
     @col_count = 8

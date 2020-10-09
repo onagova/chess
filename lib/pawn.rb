@@ -1,4 +1,4 @@
-require_relative 'piece'
+require_relative 'rook'
 require_relative 'en_passant_trigger_record'
 
 class Pawn < Piece
@@ -28,6 +28,9 @@ class Pawn < Piece
   def move(dest)
     super
     @has_moved = true
+
+    advanced_pos = @position + Vector2Int.new(0, forward)
+    promote if @board.out_of_bounds?(advanced_pos)
   end
 
   def attack_positions
@@ -118,5 +121,18 @@ class Pawn < Piece
       position + Vector2Int.new(-1, @forward),
       position + Vector2Int.new(1, @forward)
     ]
+  end
+
+  def promote
+    promotion = owner.promote(self)
+    promoted =
+      if promotion == Rook
+        Rook.new(@board, @position, @owner, true)
+      else
+        promotion.new(@board, @position, @owner)
+      end
+
+    @board.pieces.delete(self)
+    @board.pieces << promoted
   end
 end

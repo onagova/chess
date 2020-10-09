@@ -8,4 +8,6 @@ class Player
   def next_command(_); end
 
   def accept_draw; end
+
+  def promote(_); end
 end

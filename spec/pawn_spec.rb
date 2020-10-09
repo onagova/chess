@@ -168,4 +168,20 @@ describe Pawn do
       end
     end
   end
+
+  describe '#move' do
+    it 'promotes the pawn when moves into the edge of board' do
+      player_double = instance_double('Player')
+      allow(player_double).to receive(:set).and_return(Essentials::WHITE)
+      allow(player_double).to receive(:promote).and_return(Queen)
+
+      pawn = Pawn.new(board, Vector2Int.new(2, 3), player_double)
+      board.pieces = [pawn]
+
+      dest = Vector2Int.new(2, 4)
+      pawn.move(dest)
+
+      expect(board.piece_at(dest).class).to be(Queen)
+    end
+  end
 end

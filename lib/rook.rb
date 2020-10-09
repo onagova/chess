@@ -6,9 +6,9 @@ class Rook < Piece
 
   attr_reader :has_moved
 
-  def initialize(board, position, owner)
-    super
-    @has_moved = false
+  def initialize(board, position, owner, has_moved = false)
+    super(board, position, owner)
+    @has_moved = has_moved
   end
 
   def reachables

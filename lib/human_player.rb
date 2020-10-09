@@ -1,4 +1,8 @@
 require_relative 'player'
+require_relative 'queen'
+require_relative 'rook'
+require_relative 'bishop'
+require_relative 'knight'
 require_relative 'command/move_command'
 require_relative 'command/draw_request_command'
 
@@ -27,5 +31,18 @@ class HumanPlayer < Player
   def accept_draw
     print 'Accept draw? [Y/n] '
     gets.chomp.downcase == 'y'
+  end
+
+  def promote(pawn)
+    puts "\n1)Queen 2)Rook 3)Bishop 4)Knight"
+    print "Select a promotion for #{pawn}: "
+    input = gets.chomp
+
+    unless input.match?(/^[1-4]$/)
+      puts 'Invalid input. try again...'
+      return promote(pawn)
+    end
+
+    [Queen, Rook, Bishop, Knight][input.to_i - 1]
   end
 end
