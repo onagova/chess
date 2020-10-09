@@ -94,6 +94,10 @@ class King < Piece
     castling?(0, -1)
   end
 
+  def to_s
+    "K#{super}"
+  end
+
   def pretty_print
     '♚'.colorize(color_code)
   end

@@ -56,6 +56,10 @@ class Piece
     reachables.map(&:dest)
   end
 
+  def to_s
+    @position.to_file_rank
+  end
+
   def pretty_print
     '♦'.colorize(color_code)
   end

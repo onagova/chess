@@ -18,6 +18,10 @@ class Queen < Piece
     moves
   end
 
+  def to_s
+    "Q#{super}"
+  end
+
   def pretty_print
     '♛'.colorize(color_code)
   end

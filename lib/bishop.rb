@@ -14,6 +14,10 @@ class Bishop < Piece
     moves
   end
 
+  def to_s
+    "B#{super}"
+  end
+
   def pretty_print
     '♝'.colorize(color_code)
   end
