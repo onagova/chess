@@ -86,12 +86,6 @@ class King < Piece
     moves.map(&:dest)
   end
 
-  def pretty_print
-    '♚'.colorize(color_code)
-  end
-
-  private
-
   def king_side_castling?
     castling?(7, 1)
   end
@@ -99,6 +93,12 @@ class King < Piece
   def queen_side_castling?
     castling?(0, -1)
   end
+
+  def pretty_print
+    '♚'.colorize(color_code)
+  end
+
+  private
 
   def castling?(rook_x, right_mult)
     return nil if @has_moved

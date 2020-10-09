@@ -2,6 +2,7 @@ require_relative 'essentials'
 require_relative 'vector_2_int'
 require_relative 'string'
 require_relative 'end_report'
+require_relative 'position_summary'
 require_relative 'custom_error'
 require_relative 'king'
 require_relative 'rook'
@@ -90,6 +91,10 @@ class Board
     end
 
     EndReport.new(false, nil)
+  end
+
+  def position_summary
+    PositionSummary.new(self)
   end
 
   def pretty_print

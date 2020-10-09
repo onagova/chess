@@ -18,6 +18,21 @@ class Vector2Int
     @x == other.x && @y == other.y
   end
 
+  def <=>(other)
+    return 0 if self == other
+    return @x <=> other.x unless @x == other.x
+
+    @y <=> other.y
+  end
+
+  def eql?(other)
+    self == other
+  end
+
+  def hash
+    [@x, @y].hash
+  end
+
   def to_file_rank
     "#{('a'.ord + x).chr}#{y + 1}"
   end

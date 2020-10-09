@@ -19,10 +19,8 @@ class Pawn < Piece
     move = double_advanceable?
     moves << move unless move.nil?
 
-    capture_dests.each do |dest|
-      capture = capturable?(dest) || en_passant_able?(dest)
-      moves << capture unless capture.nil?
-    end
+    moves.concat capturables?
+    moves.concat en_passant_ables?
 
     moves
   end
@@ -34,6 +32,29 @@ class Pawn < Piece
 
   def attack_positions
     capture_dests.reject { |dest| @board.out_of_bounds?(dest) }
+  end
+
+  def en_passant_ables?
+    captures = []
+
+    capture_dests.each do |dest|
+      next if @board.out_of_bounds?(dest)
+
+      # next unless capture_dests.include?(dest)
+
+      next unless @board.piece_at(dest).nil?
+
+      record = @board.last_move
+      next unless record.is_a?(EnPassantTriggerRecord)
+      next unless record.en_passant_pos == dest
+
+      enemy = record.piece
+      next if enemy.owner.set == @owner.set
+
+      captures << CaptureRecord.new(self, dest, enemy)
+    end
+
+    captures
   end
 
   def pretty_print
@@ -74,30 +95,22 @@ class Pawn < Piece
     end
   end
 
-  def capturable?(dest)
-    return nil if @board.out_of_bounds?(dest)
-    return nil unless capture_dests.include?(dest)
+  def capturables?
+    captures = []
 
-    enemy = @board.piece_at(dest)
-    return nil if enemy.nil?
-    return nil if enemy.owner.set == @owner.set
+    capture_dests.each do |dest|
+      next if @board.out_of_bounds?(dest)
 
-    CaptureRecord.new(self, dest, enemy)
-  end
+      # next unless capture_dests.include?(dest)
 
-  def en_passant_able?(dest)
-    return nil if @board.out_of_bounds?(dest)
-    return nil unless capture_dests.include?(dest)
-    return nil unless @board.piece_at(dest).nil?
+      enemy = @board.piece_at(dest)
+      next if enemy.nil?
+      next if enemy.owner.set == @owner.set
 
-    record = @board.last_move
-    return nil unless record.is_a?(EnPassantTriggerRecord)
-    return nil unless record.en_passant_pos == dest
+      captures << CaptureRecord.new(self, dest, enemy)
+    end
 
-    enemy = record.piece
-    return nil if enemy.owner.set == @owner.set
-
-    CaptureRecord.new(self, dest, enemy)
+    captures
   end
 
   def capture_dests
