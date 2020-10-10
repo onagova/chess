@@ -135,4 +135,20 @@ class Pawn < Piece
     @board.pieces.delete(self)
     @board.pieces << promoted
   end
+
+  def create_mock(move)
+    mock = super
+    mock[:has_moved] = @has_moved
+    mock
+  end
+
+  def apply_mock(mock)
+    super
+    @has_moved = true
+  end
+
+  def revert_mock(mock)
+    super
+    @has_moved = mock[:has_moved]
+  end
 end

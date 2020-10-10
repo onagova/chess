@@ -30,40 +30,12 @@ class King < Piece
     moves
   end
 
-  def legal_moves
-    moves = reachables
-
-    moves.select do |move|
-      temp = @position
-      @position = move.dest
-
-      if move.is_a?(CastlingRecord)
-        rook_src = move.rook.position
-        move.rook.force_move(move.rook_dest)
-
-        safe = !@board.king_exposed?(@owner.set)
-
-        move.rook.force_move(rook_src)
-      else
-        captured = move.is_a?(CaptureRecord) ? move.captured : nil
-        captured&.enabled = false
-
-        safe = !@board.king_exposed?(@owner.set)
-
-        captured&.enabled = true
-      end
-
-      @position = temp
-      safe
-    end
-  end
-
   def move(dest)
     move = validate_destination(dest)
 
     @position = move.dest
     if move.is_a?(CastlingRecord)
-      move.rook.force_move(move.rook_dest)
+      move.rook.apply_castling(move.rook_dest)
     elsif move.is_a?(CaptureRecord)
       move.captured.enabled = false
     end
@@ -124,5 +96,40 @@ class King < Piece
     return nil if attacked_positions.include?(rook_dest)
 
     CastlingRecord.new(self, king_dest, rook, rook_dest)
+  end
+
+  def create_mock(move)
+    mock = super
+    mock[:has_moved] = @has_moved
+    return mock unless move.is_a?(CastlingRecord)
+
+    mock[:rook_src] = move.rook.position
+    mock
+  end
+
+  def apply_mock(mock)
+    move = mock[:move]
+    @position = move.dest
+    @has_moved = true
+    @board.last_move = move
+
+    if move.is_a?(CastlingRecord)
+      move.rook.apply_castling(move.rook_dest)
+    elsif move.is_a?(CaptureRecord)
+      move.captured.enabled = false
+    end
+  end
+
+  def revert_mock(mock)
+    move = mock[:move]
+    @position = mock[:prev_pos]
+    @has_moved = mock[:has_moved]
+    @board.last_move = mock[:prev_move]
+
+    if move.is_a?(CastlingRecord)
+      move.rook.revert_castling(mock[:rook_src])
+    elsif move.is_a?(CaptureRecord)
+      move.captured.enabled = true
+    end
   end
 end

@@ -26,9 +26,14 @@ class Rook < Piece
     @has_moved = true
   end
 
-  def force_move(dest)
-    @position = dest
+  def apply_castling(pos)
+    @position = pos
     @has_moved = true
+  end
+
+  def revert_castling(pos)
+    @position = pos
+    @has_moved = false
   end
 
   def to_s
@@ -37,5 +42,23 @@ class Rook < Piece
 
   def pretty_print
     '♜'.colorize(color_code)
+  end
+
+  private
+
+  def create_mock(move)
+    mock = super
+    mock[:has_moved] = @has_moved
+    mock
+  end
+
+  def apply_mock(mock)
+    super
+    @has_moved = true
+  end
+
+  def revert_mock(mock)
+    super
+    @has_moved = mock[:has_moved]
   end
 end

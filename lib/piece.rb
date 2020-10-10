@@ -22,24 +22,16 @@ class Piece
   end
 
   def legal_moves
-    moves = reachables
-
-    moves.select do |move|
-      temp = @position
-      captured = move.is_a?(CaptureRecord) ? move.captured : nil
-      prev_move = @board.last_move
-
-      @position = move.dest
-      captured&.enabled = false
-      @board.last_move = move
-
+    reachables.select do |move|
+      mock = create_mock(move)
+      apply_mock(mock)
       safe = !@board.king_exposed?(@owner.set)
-
-      @position = temp
-      captured&.enabled = true
-      @board.last_move = prev_move
-
+      revert_mock(mock)
       safe
+    end
+  end
+
+
     end
   end
 
@@ -97,6 +89,32 @@ class Piece
     raise CustomError, msg if move.nil?
 
     move
+  end
+
+  def create_mock(move)
+    {
+      move: move,
+      prev_pos: @position,
+      prev_move: @board.last_move
+    }
+  end
+
+  def apply_mock(mock)
+    move = mock[:move]
+    captured = move.is_a?(CaptureRecord) ? move.captured : nil
+
+    @position = move.dest
+    captured&.enabled = false
+    @board.last_move = move
+  end
+
+  def revert_mock(mock)
+    move = mock[:move]
+    captured = move.is_a?(CaptureRecord) ? move.captured : nil
+
+    @position = mock[:prev_pos]
+    captured&.enabled = true
+    @board.last_move = mock[:prev_move]
   end
 
   def color_code
