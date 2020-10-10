@@ -4,6 +4,8 @@ require_relative 'board'
 require_relative 'human_player'
 require_relative 'command/move_command'
 require_relative 'command/draw_request_command'
+require_relative 'command/threefold_repetition_command'
+require_relative 'command/early_threefold_repetition_command'
 require_relative 'custom_error'
 
 class GameManager
@@ -13,51 +15,106 @@ class GameManager
     @board = nil
     @white_player = nil
     @black_player = nil
+    @position_summaries = nil
   end
 
   def new_game
     @white_player = HumanPlayer.new(WHITE)
     @black_player = HumanPlayer.new(BLACK)
     @board = Board.new(@white_player, @black_player)
+    @position_summaries = { WHITE => Hash.new(0), BLACK => Hash.new(0) }
   end
 
   def play
     new_game
-    current_player = @white_player
+
     last_command = nil
-
+    current_player = @white_player
+    update_position_summaries(current_player)
     end_report = @board.end_report
+
     until end_report.locked
-      system 'clear'
-      puts @board.pretty_print + "\n"
-      puts "[#{current_player.set.capitalize}'s turn]"
+      iteration, last_command = play_turn(current_player, last_command)
 
-      if last_command.is_a?(DrawRequestCommand)
-        break if current_player.accept_draw
-      end
-
-      begin
-        last_command = current_player.next_command(@board)
-        handle_command(last_command, current_player)
-      rescue CustomError => e
-        puts e
-        puts 'try again...'
-        puts ''
-        retry
+      case iteration
+      when :break then break
       end
 
       current_player = other_player(current_player)
+      update_position_summaries(current_player)
       end_report = @board.end_report
     end
 
     declare_winner(end_report, last_command)
   end
 
+  def threefold_repetition?
+    @position_summaries.values.any? do |summaries|
+      summaries.values.any? { |count| count >= 3 }
+    end
+  end
+
+  def next_threefold_repetitions(player)
+    other = other_player(player)
+    summaries = @position_summaries[other.set]
+    repeated = summaries.each_key.select { |key| summaries[key] == 2 }
+    return [] if repeated.empty?
+
+    future_summaries = @board.future_position_summaries(player.set)
+    future_summaries.select { |item| repeated.include?(item[1]) }
+  end
+
   private
 
+  def play_turn(player, last_command)
+    system 'clear'
+    puts @board.pretty_print + "\n"
+
+    if last_command.is_a?(EarlyThreefoldRepetitionCommand)
+      src_fr = last_command.src.to_file_rank
+      dest_fr = last_command.dest.to_file_rank
+      puts "Early threefold repetition #{src_fr} -> #{dest_fr} was not available"
+      puts ''
+    end
+
+    player.hint_threefold(self)
+    puts "[#{player.set.capitalize}'s turn]"
+
+    if last_command.is_a?(DrawRequestCommand)
+      return [:break, last_command] if player.accept_draw
+    end
+
+    begin
+      command = player.next_command(@board)
+      iteration = handle_command(command, player)
+    rescue CustomError => e
+      puts e
+      puts 'Try again...'
+      puts ''
+      retry
+    end
+
+    [iteration, command]
+  end
+
   def handle_command(command, owner)
-    if command.is_a?(MoveCommand)
+    if command.is_a?(EarlyThreefoldRepetitionCommand)
+      src = command.src
+      dest = command.dest
+
+      available = next_threefold_repetitions(owner).any? do |item|
+        item[0].piece.position == src && item[0].dest == dest
+      end
+
+      @board.move_piece(src, dest, owner.set)
+      available ? :break : :normal
+    elsif command.is_a?(ThreefoldRepetitionCommand)
+      raise CustomError, 'threefold repetition draw is not available' unless threefold_repetition?
+
+      :break
+    elsif command.is_a?(MoveCommand)
       @board.move_piece(command.src, command.dest, owner.set)
+      :normal
     else
       raise CustomError, 'invalid command'
     end
@@ -69,11 +126,19 @@ class GameManager
 
     if last_command.is_a?(DrawRequestCommand)
       puts 'Game Over! Draw by agreement'
+    elsif last_command.is_a?(ThreefoldRepetitionCommand) ||
+          last_command.is_a?(EarlyThreefoldRepetitionCommand)
+      puts 'Game Over! Draw by threefold repetition'
     elsif end_report.winner.nil?
       puts 'Game Over! Stalemate'
     else
       puts "CHECKMATE! #{end_report.winner.capitalize} wins"
     end
+  end
+
+  def update_position_summaries(player)
+    summary = @board.position_summary
+    @position_summaries[player.set][summary] += 1
   end
 
   def other_player(player)

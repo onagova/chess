@@ -98,6 +98,12 @@ class Board
     PositionSummary.new(self)
   end
 
+  def future_position_summaries(set)
+    pieces_by_set(set).reduce([]) do |a, v|
+      a.concat v.future_position_summaries
+    end
+  end
+
   def pretty_print
     str = pretty_print_files_header
     (@row_count - 1).downto(0) { |n| str += pretty_print_rank(n) }

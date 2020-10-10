@@ -6,6 +6,10 @@ require_relative 'king'
 class PositionSummary
   include Essentials
 
+  attr_reader :positions, :en_passant_able,
+              :white_king_side_castling, :white_queen_side_castling,
+              :black_king_side_castling, :black_queen_side_castling
+
   def initialize(board)
     @positions = nil
     @en_passant_able = nil
@@ -21,6 +25,15 @@ class PositionSummary
     initialize_positions(pieces)
     initialize_en_passant_able(pieces)
     initialize_castling_ables(white_pieces, black_pieces)
+  end
+
+  def ==(other)
+    @positions == other.positions &&
+      @en_passant_able == other.en_passant_able &&
+      @white_king_side_castling == other.white_king_side_castling &&
+      @white_queen_side_castling == other.white_queen_side_castling &&
+      @black_king_side_castling == other.black_king_side_castling &&
+      @black_queen_side_castling == other.black_queen_side_castling
   end
 
   def eql?(other)

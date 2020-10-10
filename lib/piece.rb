@@ -31,8 +31,19 @@ class Piece
     end
   end
 
+  def future_position_summaries
+    results = []
 
+    reachables.each do |move|
+      mock = create_mock(move)
+      apply_mock(mock)
+      safe = !@board.king_exposed?(@owner.set)
+      summary = @board.position_summary
+      revert_mock(mock)
+      results << [move, summary] if safe
     end
+
+    results
   end
 
   def move(dest)

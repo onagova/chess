@@ -37,6 +37,12 @@ class Pawn < Piece
     capture_dests.reject { |dest| @board.out_of_bounds?(dest) }
   end
 
+  # Pawns can't repeat position so we don't need to check
+  # future positions for threefold repetition
+  def future_position_summaries
+    []
+  end
+
   def en_passant_ables?
     captures = []
 
