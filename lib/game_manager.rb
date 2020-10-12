@@ -2,10 +2,14 @@ require_relative 'essentials'
 require_relative 'vector_2_int'
 require_relative 'board'
 require_relative 'human_player'
+require_relative 'pawn'
+require_relative 'capture_record'
 require_relative 'command/move_command'
 require_relative 'command/draw_request_command'
 require_relative 'command/threefold_repetition_command'
 require_relative 'command/early_threefold_repetition_command'
+require_relative 'command/fifty_move_command'
+require_relative 'command/early_fifty_move_command'
 require_relative 'custom_error'
 
 class GameManager
@@ -64,20 +68,48 @@ class GameManager
     future_summaries.select { |item| repeated.include?(item[1]) }
   end
 
+  def fifty_move?
+    return false unless @board.move_history.size >= 50
+
+    @board.move_history[-50, 50].none? do |move|
+      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+    end
+  end
+
+  def next_fifty_moves(player)
+    return [] unless @board.move_history.size >= 49
+
+    available = @board.move_history[-49, 49].none? do |move|
+      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+    end
+    return [] unless available
+
+    @board.legal_moves(player.set).reject do |move|
+      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+    end
+  end
+
   private
 
   def play_turn(player, last_command)
     system 'clear'
     puts @board.pretty_print + "\n"
 
-    if last_command.is_a?(EarlyThreefoldRepetitionCommand)
+    case last_command
+    when EarlyThreefoldRepetitionCommand
       src_fr = last_command.src.to_file_rank
       dest_fr = last_command.dest.to_file_rank
       puts "Early threefold repetition #{src_fr} -> #{dest_fr} was not available"
       puts ''
+    when EarlyFiftyMoveCommand
+      src_fr = last_command.src.to_file_rank
+      dest_fr = last_command.dest.to_file_rank
+      puts "Early fifty-move #{src_fr} -> #{dest_fr} was not available"
+      puts ''
     end
 
     player.hint_threefold(self)
+    player.hint_fifty_move(self)
     puts "[#{player.set.capitalize}'s turn]"
 
     if last_command.is_a?(DrawRequestCommand)
@@ -98,7 +130,8 @@ class GameManager
   end
 
   def handle_command(command, owner)
-    if command.is_a?(EarlyThreefoldRepetitionCommand)
+    case command
+    when EarlyThreefoldRepetitionCommand
       src = command.src
       dest = command.dest
 
@@ -108,11 +141,25 @@ class GameManager
 
       @board.move_piece(src, dest, owner.set)
       available ? :break : :normal
-    elsif command.is_a?(ThreefoldRepetitionCommand)
+    when ThreefoldRepetitionCommand
       raise CustomError, 'threefold repetition draw is not available' unless threefold_repetition?
 
       :break
-    elsif command.is_a?(MoveCommand)
+    when EarlyFiftyMoveCommand
+      src = command.src
+      dest = command.dest
+
+      available = next_fifty_moves(owner).any? do |move|
+        move.piece.position == src && move.dest == dest
+      end
+
+      @board.move_piece(src, dest, owner.set)
+      available ? :break : :normal
+    when FiftyMoveCommand
+      raise CustomError, 'fifty-move rule draw is not available' unless fifty_move?
+
+      :break
+    when MoveCommand
       @board.move_piece(command.src, command.dest, owner.set)
       :normal
     else
@@ -129,6 +176,9 @@ class GameManager
     elsif last_command.is_a?(ThreefoldRepetitionCommand) ||
           last_command.is_a?(EarlyThreefoldRepetitionCommand)
       puts 'Game Over! Draw by threefold repetition'
+    elsif last_command.is_a?(FiftyMoveCommand) ||
+          last_command.is_a?(EarlyFiftyMoveCommand)
+      puts 'Game Over! Draw by fifty-move rule'
     elsif end_report.winner.nil?
       puts 'Game Over! Stalemate'
     else

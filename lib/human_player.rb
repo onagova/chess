@@ -6,15 +6,19 @@ require_relative 'knight'
 require_relative 'command/draw_request_command'
 require_relative 'command/threefold_repetition_command'
 require_relative 'command/early_threefold_repetition_command'
+require_relative 'command/fifty_move_command'
+require_relative 'command/early_fifty_move_command'
 
 class HumanPlayer < Player
   HINT_THREEFOLD_STRING = 'Hint: Draw by threefold repetition is available.'.freeze
+  HINT_FIFTY_MOVE_STRING = 'Hint: Draw by fifty-move rule is available.'.freeze
 
   def next_command(_)
     print 'Enter a command: '
     input = gets.chomp.downcase
 
     return ThreefoldRepetitionCommand.new if input == 'threefold'
+    return FiftyMoveCommand.new if input == 'fifty-move'
 
     mdata = input.match(/^([a-z][0-9]) ([a-z][0-9])$/)
     return move_command(MoveCommand, mdata[1], mdata[2]) unless mdata.nil?
@@ -24,6 +28,9 @@ class HumanPlayer < Player
 
     mdata = input.match(/^threefold ([a-z][0-9]) ([a-z][0-9])$/)
     return move_command(EarlyThreefoldRepetitionCommand, mdata[1], mdata[2]) unless mdata.nil?
+
+    mdata = input.match(/^fifty-move ([a-z][0-9]) ([a-z][0-9])$/)
+    return move_command(EarlyFiftyMoveCommand, mdata[1], mdata[2]) unless mdata.nil?
 
     nil
   end
@@ -49,6 +56,25 @@ class HumanPlayer < Player
     dest = move.dest.to_file_rank
     puts HINT_THREEFOLD_STRING
     puts "Enter 'threefold #{src} #{dest}' command to draw the game."
+    puts ''
+  end
+
+  def hint_fifty_move(game_manager)
+    if game_manager.fifty_move?
+      puts HINT_FIFTY_MOVE_STRING
+      puts 'Enter \'fifty-move\' command to draw the game.'
+      puts ''
+      return
+    end
+
+    next_moves = game_manager.next_fifty_moves(self)
+    return if next_moves.empty?
+
+    move = next_moves.first
+    src = move.piece.position.to_file_rank
+    dest = move.dest.to_file_rank
+    puts HINT_FIFTY_MOVE_STRING
+    puts "Enter 'fifty-move #{src} #{dest}' command to draw the game."
     puts ''
   end
 

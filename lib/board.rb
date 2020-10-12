@@ -74,6 +74,10 @@ class Board
     pieces_by_set(set).reduce([]) { |a, v| a.concat(v.attack_positions) }
   end
 
+  def legal_moves(set)
+    pieces_by_set(set).reduce([]) { |a, v| a.concat(v.legal_moves) }
+  end
+
   def move_piece(src, dest, set)
     piece = piece_at(src)
     raise CustomError, "#{src.to_file_rank} is empty" if piece.nil?
@@ -113,10 +117,6 @@ class Board
 
   def reachables(set)
     pieces_by_set(set).reduce([]) { |a, v| a.concat(v.reachables) }
-  end
-
-  def legal_moves(set)
-    pieces_by_set(set).reduce([]) { |a, v| a.concat(v.legal_moves) }
   end
 
   def pretty_print_files_header
