@@ -58,12 +58,12 @@ class King < Piece
     moves.map(&:dest)
   end
 
-  def king_side_castling?
-    castling?(7, 1)
+  def king_side_castling_right?
+    castling_right?(7)
   end
 
-  def queen_side_castling?
-    castling?(0, -1)
+  def queen_side_castling_right?
+    castling_right?(0)
   end
 
   def to_s
@@ -75,6 +75,24 @@ class King < Piece
   end
 
   private
+
+  def castling_right?(rook_x)
+    return false if @has_moved
+
+    rook = @board.piece_at(Vector2Int.new(rook_x, @position.y))
+    return false unless rook.is_a?(Rook)
+    return false if rook.has_moved
+
+    rook.owner.set == @owner.set
+  end
+
+  def king_side_castling?
+    castling?(7, 1)
+  end
+
+  def queen_side_castling?
+    castling?(0, -1)
+  end
 
   def castling?(rook_x, right_mult)
     return nil if @has_moved

@@ -84,9 +84,9 @@ class PositionSummary
     white_king = white_pieces.find { |piece| piece.is_a?(King) }
     black_king = black_pieces.find { |piece| piece.is_a?(King) }
 
-    @white_king_side_castling = !white_king.king_side_castling?.nil?
-    @white_queen_side_castling = !white_king.queen_side_castling?.nil?
-    @black_king_side_castling = !black_king.king_side_castling?.nil?
-    @black_queen_side_castling = !black_king.queen_side_castling?.nil?
+    @white_king_side_castling = white_king.king_side_castling_right?
+    @white_queen_side_castling = white_king.queen_side_castling_right?
+    @black_king_side_castling = black_king.king_side_castling_right?
+    @black_queen_side_castling = black_king.queen_side_castling_right?
   end
 end
