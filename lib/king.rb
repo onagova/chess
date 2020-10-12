@@ -40,7 +40,7 @@ class King < Piece
       move.captured.enabled = false
     end
 
-    @board.last_move = move
+    @board.history << move
     @has_moved = true
   end
 
@@ -129,7 +129,7 @@ class King < Piece
     move = mock[:move]
     @position = move.dest
     @has_moved = true
-    @board.last_move = move
+    @board.move_history << move
 
     if move.is_a?(CastlingRecord)
       move.rook.apply_castling(move.rook_dest)
@@ -142,7 +142,7 @@ class King < Piece
     move = mock[:move]
     @position = mock[:prev_pos]
     @has_moved = mock[:has_moved]
-    @board.last_move = mock[:prev_move]
+    @board.move_history.pop
 
     if move.is_a?(CastlingRecord)
       move.rook.revert_castling(mock[:rook_src])

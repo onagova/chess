@@ -52,7 +52,7 @@ class Piece
     @position = move.dest
     move.captured.enabled = false if move.is_a?(CaptureRecord)
 
-    @board.last_move = move
+    @board.move_history << move
   end
 
   def attack_positions
@@ -103,11 +103,7 @@ class Piece
   end
 
   def create_mock(move)
-    {
-      move: move,
-      prev_pos: @position,
-      prev_move: @board.last_move
-    }
+    { move: move, prev_pos: @position }
   end
 
   def apply_mock(mock)
@@ -116,7 +112,7 @@ class Piece
 
     @position = move.dest
     captured&.enabled = false
-    @board.last_move = move
+    @board.move_history << move
   end
 
   def revert_mock(mock)
@@ -125,7 +121,7 @@ class Piece
 
     @position = mock[:prev_pos]
     captured&.enabled = true
-    @board.last_move = mock[:prev_move]
+    @board.move_history.pop
   end
 
   def color_code

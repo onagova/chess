@@ -53,7 +53,7 @@ class Pawn < Piece
 
       next unless @board.piece_at(dest).nil?
 
-      record = @board.last_move
+      record = @board.move_history.last
       next unless record.is_a?(EnPassantTriggerRecord)
       next unless record.en_passant_pos == dest
 

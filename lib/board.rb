@@ -14,13 +14,12 @@ require_relative 'pawn'
 class Board
   include Essentials
 
-  attr_accessor :last_move
-  attr_reader :pieces
+  attr_reader :pieces, :move_history
 
   def initialize(white_player, black_player)
     @col_count = 8
     @row_count = 8
-    @last_move = nil
+    @move_history = []
 
     @pieces = [
       Rook.new(self, Vector2Int.new(0, 0), white_player),

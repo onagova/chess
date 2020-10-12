@@ -6,7 +6,7 @@ class TestingBoard < Board
   def initialize(col_count, row_count)
     @col_count = col_count
     @row_count = row_count
-    @last_move = nil
+    @move_history = []
 
     @pieces = []
   end

@@ -13,7 +13,7 @@ describe Pawn do
       en_passant_dest = Vector2Int.new(3, 2)
       en_passant_piece = Pawn.new(board, en_passant_dest, black_player)
 
-      board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
+      board.move_history << EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
       board.pieces = [
         pawn,
         en_passant_piece,
@@ -110,7 +110,7 @@ describe Pawn do
         en_passant_dest = Vector2Int.new(3, 4)
         en_passant_piece = Pawn.new(board, en_passant_dest, white_player)
 
-        board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
+        board.move_history << EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
         board.pieces = [
           pawn,
           en_passant_piece
@@ -124,7 +124,7 @@ describe Pawn do
         en_passant_dest = Vector2Int.new(3, 2)
         en_passant_piece = Pawn.new(board, en_passant_dest, black_player)
 
-        board.last_move = EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
+        board.move_history << EnPassantTriggerRecord.new(en_passant_piece, en_passant_dest)
         board.pieces = [
           pawn,
           en_passant_piece,
