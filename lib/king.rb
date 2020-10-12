@@ -40,7 +40,7 @@ class King < Piece
       move.captured.enabled = false
     end
 
-    @board.history << move
+    @board.move_history << move
     @has_moved = true
   end
 
