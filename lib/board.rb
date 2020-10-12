@@ -110,7 +110,7 @@ class Board
   def pretty_print
     str = pretty_print_files_header
     (@row_count - 1).downto(0) { |n| str += pretty_print_rank(n) }
-    str + pretty_print_files_header
+    str + pretty_print_files_header + pretty_print_check_all
   end
 
   private
@@ -162,5 +162,22 @@ class Board
       3.times { str += ' '.colorize_bg(bg_colors[bg_index]) }
     end
     str + " #{rank + 1} \n"
+  end
+
+  def pretty_print_check_all
+    str = pretty_print_check(WHITE)
+    return str unless str.empty?
+
+    pretty_print_check(BLACK)
+  end
+
+  def pretty_print_check(set)
+    capture = king_exposed?(set)
+    return '' if capture.nil?
+
+    str = "#{set.to_s.capitalize} king is checked by #{capture.piece}\n"
+    return str if str.length > 62
+
+    str.rjust((62 - str.length) / 2 + str.length)
   end
 end
