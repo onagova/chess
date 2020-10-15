@@ -52,7 +52,7 @@ class HumanPlayer < Player
     return if next_repeated.empty?
 
     move = next_repeated[0][0]
-    src = move.piece.position.to_file_rank
+    src = move.src.to_file_rank
     dest = move.dest.to_file_rank
     puts HINT_THREEFOLD_STRING
     puts "Enter 'threefold #{src} #{dest}' command to draw the game."
@@ -71,7 +71,7 @@ class HumanPlayer < Player
     return if next_moves.empty?
 
     move = next_moves.first
-    src = move.piece.position.to_file_rank
+    src = move.src.to_file_rank
     dest = move.dest.to_file_rank
     puts HINT_FIFTY_MOVE_STRING
     puts "Enter 'fifty-move #{src} #{dest}' command to draw the game."

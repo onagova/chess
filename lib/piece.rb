@@ -48,9 +48,10 @@ class Piece
 
   def move(dest)
     move = validate_destination(dest)
+    captured = @board.piece_at(move.capture_pos) if move.is_a?(CaptureRecord)
 
     @position = move.dest
-    move.captured.enabled = false if move.is_a?(CaptureRecord)
+    captured&.enabled = false
 
     @board.move_history << move
   end
@@ -79,9 +80,18 @@ class Piece
       piece = @board.piece_at(current_dest)
 
       if piece.nil?
-        moves << MoveRecord.new(self, current_dest)
+        moves << MoveRecord.new(
+          self.class,
+          @position,
+          current_dest
+        )
       elsif piece.owner.set != @owner.set
-        moves << CaptureRecord.new(self, current_dest, piece)
+        moves << CaptureRecord.new(
+          self.class,
+          @position,
+          current_dest,
+          piece.position
+        )
         break
       else
         break
@@ -103,24 +113,20 @@ class Piece
   end
 
   def create_mock(move)
-    { move: move, prev_pos: @position }
+    captured = @board.piece_at(move.capture_pos) if move.is_a?(CaptureRecord)
+
+    { move: move, captured: captured }
   end
 
   def apply_mock(mock)
-    move = mock[:move]
-    captured = move.is_a?(CaptureRecord) ? move.captured : nil
-
-    @position = move.dest
-    captured&.enabled = false
-    @board.move_history << move
+    @position = mock[:move].dest
+    mock[:captured]&.enabled = false
+    @board.move_history << mock[:move]
   end
 
   def revert_mock(mock)
-    move = mock[:move]
-    captured = move.is_a?(CaptureRecord) ? move.captured : nil
-
-    @position = mock[:prev_pos]
-    captured&.enabled = true
+    @position = mock[:move].src
+    mock[:captured]&.enabled = true
     @board.move_history.pop
   end
 

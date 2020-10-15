@@ -33,13 +33,15 @@ class King < Piece
   def move(dest)
     move = validate_destination(dest)
 
-    @position = move.dest
     if move.is_a?(CastlingRecord)
-      move.rook.apply_castling(move.rook_dest)
+      rook = @board.piece_at(move.rook_src)
+      rook.apply_castling(move.rook_dest)
     elsif move.is_a?(CaptureRecord)
-      move.captured.enabled = false
+      captured = @board.piece_at(move.capture_pos)
+      captured.enabled = false
     end
 
+    @position = move.dest
     @board.move_history << move
     @has_moved = true
   end
@@ -113,7 +115,7 @@ class King < Piece
     return nil if attacked_positions.include?(king_dest)
     return nil if attacked_positions.include?(rook_dest)
 
-    CastlingRecord.new(self, king_dest, rook, rook_dest)
+    CastlingRecord.new(@position, king_dest, rook.position, rook_dest)
   end
 
   def create_mock(move)
@@ -121,7 +123,7 @@ class King < Piece
     mock[:has_moved] = @has_moved
     return mock unless move.is_a?(CastlingRecord)
 
-    mock[:rook_src] = move.rook.position
+    mock[:rook] = @board.piece_at(move.rook_src)
     mock
   end
 
@@ -132,22 +134,22 @@ class King < Piece
     @board.move_history << move
 
     if move.is_a?(CastlingRecord)
-      move.rook.apply_castling(move.rook_dest)
+      mock[:rook].apply_castling(move.rook_dest)
     elsif move.is_a?(CaptureRecord)
-      move.captured.enabled = false
+      mock[:captured].enabled = false
     end
   end
 
   def revert_mock(mock)
     move = mock[:move]
-    @position = mock[:prev_pos]
+    @position = move.src
     @has_moved = mock[:has_moved]
     @board.move_history.pop
 
     if move.is_a?(CastlingRecord)
-      move.rook.revert_castling(mock[:rook_src])
+      mock[:rook].revert_castling(move.rook_src)
     elsif move.is_a?(CaptureRecord)
-      move.captured.enabled = true
+      mock[:captured].enabled = true
     end
   end
 end

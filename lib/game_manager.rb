@@ -72,7 +72,7 @@ class GameManager
     return false unless @board.move_history.size >= 50
 
     @board.move_history[-50, 50].none? do |move|
-      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+      move.is_a?(CaptureRecord) || move.piece_type == Pawn
     end
   end
 
@@ -80,12 +80,12 @@ class GameManager
     return [] unless @board.move_history.size >= 49
 
     available = @board.move_history[-49, 49].none? do |move|
-      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+      move.is_a?(CaptureRecord) || move.piece_type == Pawn
     end
     return [] unless available
 
     @board.legal_moves(player.set).reject do |move|
-      move.is_a?(CaptureRecord) || move.piece.is_a?(Pawn)
+      move.is_a?(CaptureRecord) || move.piece_type == Pawn
     end
   end
 
@@ -136,7 +136,7 @@ class GameManager
       dest = command.dest
 
       available = next_threefold_repetitions(owner).any? do |item|
-        item[0].piece.position == src && item[0].dest == dest
+        item[0].src == src && item[0].dest == dest
       end
 
       @board.move_piece(src, dest, owner.set)
@@ -150,7 +150,7 @@ class GameManager
       dest = command.dest
 
       available = next_fifty_moves(owner).any? do |move|
-        move.piece.position == src && move.dest == dest
+        move.src == src && move.dest == dest
       end
 
       @board.move_piece(src, dest, owner.set)

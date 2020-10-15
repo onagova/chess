@@ -76,8 +76,12 @@ describe King do
         board.pieces = pieces
 
         castling = king.reachables.select { |v| v.is_a?(CastlingRecord) }
-        king_side_castling = castling.find { |v| v.rook == king_side_rook }
-        queen_side_castling = castling.find { |v| v.rook == queen_side_rook }
+        king_side_castling = castling.find do |v|
+          board.piece_at(v.rook_src) == king_side_rook
+        end
+        queen_side_castling = castling.find do |v|
+          board.piece_at(v.rook_src) == queen_side_rook
+        end
 
         expect(king_side_castling.dest).to eq(Vector2Int.new(6, 0))
         expect(king_side_castling.rook_dest).to eq(Vector2Int.new(5, 0))

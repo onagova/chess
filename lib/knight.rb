@@ -31,9 +31,9 @@ class Knight < Piece
 
     piece = @board.piece_at(dest)
     if piece.nil?
-      MoveRecord.new(self, dest)
+      MoveRecord.new(Knight, @position, dest)
     elsif piece.owner.set != @owner.set
-      CaptureRecord.new(self, dest, piece)
+      CaptureRecord.new(Knight, @position, dest, piece.position)
     end
   end
 end

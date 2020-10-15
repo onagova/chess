@@ -57,10 +57,15 @@ class Pawn < Piece
       next unless record.is_a?(EnPassantTriggerRecord)
       next unless record.en_passant_pos == dest
 
-      enemy = record.piece
+      enemy = @board.piece_at(record.dest)
       next if enemy.owner.set == @owner.set
 
-      captures << CaptureRecord.new(self, dest, enemy)
+      captures << CaptureRecord.new(
+        Pawn,
+        @position,
+        dest,
+        enemy.position
+      )
     end
 
     captures
@@ -77,7 +82,7 @@ class Pawn < Piece
     return nil if @board.out_of_bounds?(dest)
     return nil unless @board.piece_at(dest).nil?
 
-    MoveRecord.new(self, dest)
+    MoveRecord.new(Pawn, @position, dest)
   end
 
   def double_advanceable?
@@ -98,9 +103,9 @@ class Pawn < Piece
       (right_piece.is_a?(Pawn) && right_piece.owner.set != @owner.set)
 
     if en_passant_trigger
-      EnPassantTriggerRecord.new(self, dest)
+      EnPassantTriggerRecord.new(@position, dest)
     else
-      MoveRecord.new(self, dest)
+      MoveRecord.new(Pawn, @position, dest)
     end
   end
 
@@ -116,7 +121,12 @@ class Pawn < Piece
       next if enemy.nil?
       next if enemy.owner.set == @owner.set
 
-      captures << CaptureRecord.new(self, dest, enemy)
+      captures << CaptureRecord.new(
+        Pawn,
+        @position,
+        dest,
+        enemy.position
+      )
     end
 
     captures

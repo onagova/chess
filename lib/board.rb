@@ -65,9 +65,10 @@ class Board
 
   def king_exposed?(set)
     other_set = set == WHITE ? BLACK : WHITE
-    reachables(other_set).find do |move|
-      move.is_a?(CaptureRecord) && move.captured.is_a?(King)
+    captures = reachables(other_set).select do |move|
+      move.is_a?(CaptureRecord)
     end
+    captures.find { |move| piece_at(move.capture_pos).is_a?(King) }
   end
 
   def attack_positions(set)
@@ -175,7 +176,8 @@ class Board
     capture = king_exposed?(set)
     return '' if capture.nil?
 
-    str = "#{set.to_s.capitalize} king is checked by #{capture.piece}\n"
+    attacker = piece_at(capture.src)
+    str = "#{set.to_s.capitalize} king is checked by #{attacker}\n"
     return str if str.length > 62
 
     str.rjust((62 - str.length) / 2 + str.length)
