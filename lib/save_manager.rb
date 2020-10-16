@@ -13,7 +13,7 @@ class SaveManager
 
   def open_save_menu(header, *args)
     save_slot = gets_save_slot
-    return nil if save_slot.nil?
+    return '' if save_slot.nil?
 
     basename = "slot#{save_slot}.sv"
     absolute_fname = File.join(@dir, basename)
@@ -26,7 +26,7 @@ class SaveManager
 
   def open_load_menu
     save_slot = gets_save_slot
-    return [nil, nil] if save_slot.nil?
+    return ['', nil] if save_slot.nil?
 
     absolute_fname = list_fnames[save_slot]
     if absolute_fname.nil?
