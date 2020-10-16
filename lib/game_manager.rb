@@ -4,12 +4,15 @@ require_relative 'essentials'
 require_relative 'save_manager'
 require_relative './move_records/capture_record'
 require_relative './pieces/pawn'
+require_relative './players/cpu_player'
 require_relative './players/human_player'
 
 Dir['./lib/commands/*'].sort.each { |file| require file }
 
 class GameManager
   include Essentials
+
+  attr_reader :board
 
   def initialize
     @white_player = nil
@@ -96,8 +99,12 @@ class GameManager
   end
 
   def new_game
-    @white_player = HumanPlayer.new(WHITE)
-    @black_player = HumanPlayer.new(BLACK)
+    controller = gets_controller_type(WHITE)
+    @white_player = controller.new(WHITE)
+
+    controller = gets_controller_type(BLACK)
+    @black_player = controller.new(BLACK)
+
     @board = Board.new(@white_player, @black_player)
     update_position_summaries(@white_player)
 
@@ -166,7 +173,7 @@ class GameManager
     end
 
     begin
-      command = player.next_command(@board)
+      command = player.next_command(self)
       iteration = handle_command(command, player)
     rescue CustomError => e
       puts e
@@ -251,5 +258,21 @@ class GameManager
 
   def other_player(player)
     player == @white_player ? @black_player : @white_player
+  end
+
+  def gets_controller_type(set)
+    loop do
+      puts '1)Human 2)CPU'
+      print "Select #{set.to_s.capitalize} player type: "
+      input = gets.chomp
+
+      case input
+      when '1' then return HumanPlayer
+      when '2' then return CPUPlayer
+      else puts "Invalid input: #{input}"
+      end
+
+      puts ''
+    end
   end
 end

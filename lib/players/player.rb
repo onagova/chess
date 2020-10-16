@@ -16,6 +16,10 @@ class Player
 
   def accept_draw; end
 
+  def hint_threefold(_); end
+
+  def hint_fifty_move(_); end
+
   def promote(_); end
 
   def assign_promotion_backlog(moves)
