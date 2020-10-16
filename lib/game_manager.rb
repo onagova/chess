@@ -106,8 +106,8 @@ class GameManager
   end
 
   def load_game(data)
-    @white_player = data[1].new(WHITE)
-    @black_player = data[2].new(BLACK)
+    @white_player = data[1]
+    @black_player = data[2]
     @board = Board.new(@white_player, @black_player)
 
     move_history = data[3]
@@ -214,9 +214,9 @@ class GameManager
     when SaveCommand
       puts ''
       @save_load_msg = @save_manager.open_save_menu(
-        'Human vs Human',
-        @white_player.class,
-        @black_player.class,
+        "#{@white_player.name} vs #{@black_player.name}",
+        @white_player,
+        @black_player,
         @board.move_history
       )
       :next

@@ -10,6 +10,17 @@ class HumanPlayer < Player
   HINT_THREEFOLD_STRING = 'Hint: Draw by threefold repetition is available.'.freeze
   HINT_FIFTY_MOVE_STRING = 'Hint: Draw by fifty-move rule is available.'.freeze
 
+  def initialize(set)
+    prompt =
+      "Enter #{set.to_s.capitalize} player's name " \
+      "(max #{MAX_NAME_LENGTH} characters): "
+    print prompt
+    input = gets.chomp
+    mdata = input.match(/\w+/)
+    name = mdata.nil? ? 'Anon' : mdata[0][0, 8]
+    super(set, name)
+  end
+
   def next_command(_)
     print 'Enter a command: '
     input = gets.chomp.downcase

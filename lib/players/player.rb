@@ -2,9 +2,12 @@ require_relative '../move_records/promotion_move_record'
 require_relative '../move_records/promotion_capture_record'
 
 class Player
-  attr_reader :set
+  MAX_NAME_LENGTH = 6
 
-  def initialize(set)
+  attr_reader :name, :set
+
+  def initialize(set, name = 'Anon')
+    @name = name
     @set = set
     @promotion_backlog = []
   end
