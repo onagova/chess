@@ -1,5 +1,5 @@
 require_relative 'move_record'
-require_relative 'pawn'
+require_relative '../pieces/pawn'
 
 class PromotionMoveRecord < MoveRecord
   attr_reader :promotion

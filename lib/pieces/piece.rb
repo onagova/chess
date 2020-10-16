@@ -1,8 +1,8 @@
-require_relative 'essentials'
-require_relative 'vector_2_int'
-require_relative 'capture_record'
-require_relative 'string'
-require_relative 'custom_error'
+require_relative '../custom_error'
+require_relative '../essentials'
+require_relative '../string'
+require_relative '../vector_2_int'
+require_relative '../move_records/capture_record'
 
 class Piece
   include Essentials

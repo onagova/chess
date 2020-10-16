@@ -1,3 +1,6 @@
+require_relative '../move_records/promotion_move_record'
+require_relative '../move_records/promotion_capture_record'
+
 class Player
   attr_reader :set
 

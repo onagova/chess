@@ -1,7 +1,4 @@
 require_relative 'essentials'
-require_relative 'board'
-require_relative 'pawn'
-require_relative 'king'
 
 class PositionSummary
   include Essentials

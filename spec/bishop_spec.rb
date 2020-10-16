@@ -1,6 +1,6 @@
-require './lib/bishop'
 require './lib/testing_board'
-require './lib/player'
+require './lib/pieces/bishop'
+require './lib/players/player'
 
 describe Bishop do
   let(:board) { TestingBoard.new(5, 5) }

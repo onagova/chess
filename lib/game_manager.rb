@@ -1,17 +1,12 @@
-require_relative 'essentials'
-require_relative 'vector_2_int'
 require_relative 'board'
-require_relative 'human_player'
-require_relative 'pawn'
-require_relative 'capture_record'
-require_relative 'command/move_command'
-require_relative 'command/draw_request_command'
-require_relative 'command/threefold_repetition_command'
-require_relative 'command/early_threefold_repetition_command'
-require_relative 'command/fifty_move_command'
-require_relative 'command/early_fifty_move_command'
 require_relative 'custom_error'
+require_relative 'essentials'
 require_relative 'save_manager'
+require_relative './move_records/capture_record'
+require_relative './pieces/pawn'
+require_relative './players/human_player'
+
+Dir['./lib/commands/*'].sort.each { |file| require file }
 
 class GameManager
   include Essentials

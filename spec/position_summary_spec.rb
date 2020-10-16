@@ -1,6 +1,6 @@
 require './lib/position_summary'
 require './lib/testing_board'
-require './lib/player'
+require './lib/players/player'
 
 describe PositionSummary do
   let(:board) { TestingBoard.new(8, 8) }

@@ -1,8 +1,4 @@
-require_relative 'file_rank_converter'
-
 class Vector2Int
-  include FileRankConverter
-
   attr_reader :x, :y
 
   def initialize(x, y)

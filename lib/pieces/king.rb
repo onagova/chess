@@ -1,6 +1,6 @@
 require_relative 'rook'
-require_relative 'eight_way_directions'
-require_relative 'castling_record'
+require_relative '../eight_way_directions'
+require_relative '../move_records/castling_record'
 
 class King < Piece
   include EightWayDirections

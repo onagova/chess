@@ -1,7 +1,7 @@
 require_relative 'rook'
-require_relative 'en_passant_trigger_record'
-require_relative 'promotion_move_record'
-require_relative 'promotion_capture_record'
+require_relative '../move_records/en_passant_trigger_record'
+require_relative '../move_records/promotion_move_record'
+require_relative '../move_records/promotion_capture_record'
 
 class Pawn < Piece
   attr_reader :forward

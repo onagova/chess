@@ -1,5 +1,5 @@
 require_relative 'piece'
-require_relative 'eight_way_directions'
+require_relative '../eight_way_directions'
 
 class Queen < Piece
   include EightWayDirections

@@ -1,6 +1,6 @@
 require_relative 'move_record'
-require_relative 'vector_2_int'
-require_relative 'pawn'
+require_relative '../vector_2_int'
+require_relative '../pieces/pawn'
 
 class EnPassantTriggerRecord < MoveRecord
   attr_reader :en_passant_pos

@@ -1,16 +1,10 @@
 require_relative 'player'
-require_relative 'queen'
-require_relative 'rook'
-require_relative 'bishop'
-require_relative 'knight'
-require_relative 'promotion_move_record'
-require_relative 'promotion_capture_record'
-require_relative 'command/draw_request_command'
-require_relative 'command/threefold_repetition_command'
-require_relative 'command/early_threefold_repetition_command'
-require_relative 'command/fifty_move_command'
-require_relative 'command/early_fifty_move_command'
-require_relative 'command/save_command'
+require_relative '../pieces/bishop'
+require_relative '../pieces/knight'
+require_relative '../pieces/queen'
+require_relative '../pieces/rook'
+
+Dir['.lib/commands/*'].sort.each { |file| require file }
 
 class HumanPlayer < Player
   HINT_THREEFOLD_STRING = 'Hint: Draw by threefold repetition is available.'.freeze

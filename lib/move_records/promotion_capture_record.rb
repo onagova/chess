@@ -1,5 +1,5 @@
 require_relative 'capture_record'
-require_relative 'pawn'
+require_relative '../pieces/pawn'
 
 class PromotionCaptureRecord < CaptureRecord
   attr_reader :promotion

@@ -1,7 +1,7 @@
-require './lib/king'
-require './lib/pawn'
 require './lib/testing_board'
-require './lib/player'
+require './lib/pieces/king'
+require './lib/pieces/pawn'
+require './lib/players/player'
 
 describe King do
   let(:white_player) { Player.new(Essentials::WHITE) }

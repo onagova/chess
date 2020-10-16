@@ -1,6 +1,6 @@
-require './lib/pawn'
 require './lib/testing_board'
-require './lib/player'
+require './lib/pieces/pawn'
+require './lib/players/player'
 
 describe Pawn do
   let(:board) { TestingBoard.new(5, 5) }
