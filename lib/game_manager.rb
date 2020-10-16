@@ -99,16 +99,17 @@ class GameManager
   end
 
   def new_game
+    puts "\nstarting a new game..."
+    puts ''
     controller = gets_controller_type(WHITE)
     @white_player = controller.new(WHITE)
-
+    puts ''
     controller = gets_controller_type(BLACK)
     @black_player = controller.new(BLACK)
 
     @board = Board.new(@white_player, @black_player)
     update_position_summaries(@white_player)
 
-    @save_load_msg = 'starting a new game...'
     @white_player
   end
 
@@ -269,7 +270,7 @@ class GameManager
       case input
       when '1' then return HumanPlayer
       when '2' then return CPUPlayer
-      else puts "Invalid input: #{input}"
+      else puts 'Invalid input. Try again...'
       end
 
       puts ''

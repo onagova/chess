@@ -50,7 +50,7 @@ class SaveManager
       return nil if temp.downcase == 'c'
       return temp.to_i - 1 if temp.match?(/[1-6]/)
 
-      puts "Invalid save slot: #{temp}"
+      puts 'Invalid input. Try again...'
       puts ''
     end
   end
