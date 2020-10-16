@@ -11,36 +11,31 @@ require_relative 'command/early_threefold_repetition_command'
 require_relative 'command/fifty_move_command'
 require_relative 'command/early_fifty_move_command'
 require_relative 'custom_error'
+require_relative 'save_manager'
 
 class GameManager
   include Essentials
 
   def initialize
-    @board = nil
     @white_player = nil
     @black_player = nil
+    @board = nil
     @position_summaries = nil
-  end
-
-  def new_game
-    @white_player = HumanPlayer.new(WHITE)
-    @black_player = HumanPlayer.new(BLACK)
-    @board = Board.new(@white_player, @black_player)
-    @position_summaries = { WHITE => Hash.new(0), BLACK => Hash.new(0) }
+    @save_manager = SaveManager.new
+    @save_load_msg = ''
   end
 
   def play
-    new_game
+    current_player = late_initialize
 
     last_command = nil
-    current_player = @white_player
-    update_position_summaries(current_player)
     end_report = @board.end_report
 
     until end_report.locked
       iteration, last_command = play_turn(current_player, last_command)
 
       case iteration
+      when :next then next
       when :break then break
       end
 
@@ -91,9 +86,68 @@ class GameManager
 
   private
 
+  def late_initialize
+    @position_summaries = { WHITE => Hash.new(0), BLACK => Hash.new(0) }
+
+    puts 'Load saved game? [Y/n]: '
+    input = gets.chomp.downcase
+    return new_game unless input == 'y'
+
+    puts ''
+    @save_load_msg, loaded_data = @save_manager.open_load_menu
+    return new_game if loaded_data.nil?
+
+    load_game(loaded_data)
+  end
+
+  def new_game
+    @white_player = HumanPlayer.new(WHITE)
+    @black_player = HumanPlayer.new(BLACK)
+    @board = Board.new(@white_player, @black_player)
+    update_position_summaries(@white_player)
+
+    @save_load_msg = 'starting a new game...'
+    @white_player
+  end
+
+  def load_game(data)
+    @white_player = data[1].new(WHITE)
+    @black_player = data[2].new(BLACK)
+    @board = Board.new(@white_player, @black_player)
+
+    move_history = data[3]
+    white_moves = move_history.values_at(
+      *move_history.each_index.select(&:even?)
+    )
+    black_moves = move_history.values_at(
+      *move_history.each_index.select(&:odd?)
+    )
+
+    @white_player.assign_promotion_backlog(white_moves)
+    @black_player.assign_promotion_backlog(black_moves)
+
+    current_player = @white_player
+    update_position_summaries(current_player)
+
+    move_history.each do |move|
+      @board.move_piece(move.src, move.dest, current_player.set)
+
+      current_player = other_player(current_player)
+      update_position_summaries(current_player)
+    end
+
+    current_player
+  end
+
   def play_turn(player, last_command)
     system 'clear'
     puts @board.pretty_print + "\n"
+
+    unless @save_load_msg.empty?
+      puts @save_load_msg
+      puts ''
+      @save_load_msg = ''
+    end
 
     case last_command
     when EarlyThreefoldRepetitionCommand
@@ -162,6 +216,15 @@ class GameManager
     when MoveCommand
       @board.move_piece(command.src, command.dest, owner.set)
       :normal
+    when SaveCommand
+      puts ''
+      @save_load_msg = @save_manager.open_save_menu(
+        'Human vs Human',
+        @white_player.class,
+        @black_player.class,
+        @board.move_history
+      )
+      :next
     else
       raise CustomError, 'invalid command'
     end

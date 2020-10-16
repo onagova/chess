@@ -3,11 +3,14 @@ require_relative 'queen'
 require_relative 'rook'
 require_relative 'bishop'
 require_relative 'knight'
+require_relative 'promotion_move_record'
+require_relative 'promotion_capture_record'
 require_relative 'command/draw_request_command'
 require_relative 'command/threefold_repetition_command'
 require_relative 'command/early_threefold_repetition_command'
 require_relative 'command/fifty_move_command'
 require_relative 'command/early_fifty_move_command'
+require_relative 'command/save_command'
 
 class HumanPlayer < Player
   HINT_THREEFOLD_STRING = 'Hint: Draw by threefold repetition is available.'.freeze
@@ -17,6 +20,7 @@ class HumanPlayer < Player
     print 'Enter a command: '
     input = gets.chomp.downcase
 
+    return SaveCommand.new if input == 'save'
     return ThreefoldRepetitionCommand.new if input == 'threefold'
     return FiftyMoveCommand.new if input == 'fifty-move'
 
@@ -79,6 +83,8 @@ class HumanPlayer < Player
   end
 
   def promote(pawn)
+    return @promotion_backlog.shift unless @promotion_backlog.empty?
+
     puts "\n1)Queen 2)Rook 3)Bishop 4)Knight"
     print "Select a promotion for #{pawn}: "
     input = gets.chomp

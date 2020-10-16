@@ -1,5 +1,7 @@
 require_relative 'rook'
 require_relative 'en_passant_trigger_record'
+require_relative 'promotion_move_record'
+require_relative 'promotion_capture_record'
 
 class Pawn < Piece
   attr_reader :forward
@@ -150,6 +152,25 @@ class Pawn < Piece
 
     @board.pieces.delete(self)
     @board.pieces << promoted
+
+    last_move = @board.move_history.pop
+    promotion_move =
+      if last_move.is_a?(CaptureRecord)
+        PromotionCaptureRecord.new(
+          last_move.src,
+          last_move.dest,
+          last_move.capture_pos,
+          promotion
+        )
+      else
+        PromotionMoveRecord.new(
+          last_move.src,
+          last_move.dest,
+          promotion
+        )
+      end
+
+    @board.move_history << promotion_move
   end
 
   def create_mock(move)
